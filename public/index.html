@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Toji C.AI</title>
+  <link rel="icon" type="image/x-icon" href="https://r2.easyimg.io/on1orzpao/chatgpt_logo.png">
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.5.0/styles/default.min.css">
+  <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.5.0/highlight.min.js"></script>
+  <style>
+    body {
+      font-family: 'Roboto', sans-serif;
+      background-color: #FFFFF0;
+      color: #333;
+      margin: 0;
+      padding: 0;
+    }
+    .header {
+      text-align: center;
+      padding: 30px 0 10px 0;
+    }
+    .avatar {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      margin: 0 auto 15px auto;
+      display: block;
+      object-fit: cover;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+      border: 3px solid #333;
+    }
+    .header h1 {
+      font-size: 36px;
+      margin: 10px 0 0;
+      color: #333; 
+    }
+    .header p {
+      font-size: 18px;
+      color: #555;
+      margin: 5px 0 0;
+    }
+    .header a {
+      color: #1d2b64;
+      text-decoration: none;
+      font-weight: bold;
+    }
+    .container {
+      max-width: 800px;
+      margin: 20px auto;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      background-color: #fff;
+      overflow-y: auto;
+      max-height: 70vh;
+    }
+    .message {
+      background-color: #FAF9F6;
+      border-radius: 20px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      margin-bottom: 20px;
+      padding: 15px;
+      position: relative;
+      color: #000;
+      white-space: pre-wrap;
+      word-wrap: break-word;
+    }
+    .user-message {
+      text-align: right;
+      background-color: #E6F0FF;
+    }
+    .bot-message {
+      text-align: left;
+      background-color: #FAF9F6;
+    }
+    .input-container {
+      display: flex;
+      align-items: center;
+      margin-bottom: 20px;
+      position: relative;
+      max-width: 800px;
+      margin: 0 auto 20px auto;
+    }
+    .user-input {
+      flex: 1;
+      padding: 12px 50px 12px 12px;
+      border: none;
+      border-radius: 30px;
+      font-size: 16px;
+      transition: box-shadow 0.3s ease;
+      background-color: #f9f9f9;
+      color: #333;
+      max-height: 100px;
+      overflow-y: auto;
+    }
+    .user-input:focus {
+      outline: none;
+      box-shadow: 0 0 6px rgba(0, 0, 255, 0.5);
+    }
+    .send-icon {
+      position: absolute;
+      right: 10px;
+      width: 36px;
+      height: 36px;
+      background: #fff; 
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+    .send-icon:hover {
+      background: #ddd; 
+    }
+    .send-icon img {
+      width: 20px;
+      height: 20px;
+      border-radius: 50%; 
+    }
+    .copy-icon {
+      position: absolute;
+      top: 5px;
+      right: 5px;
+      width: 24px;
+      height: 24px;
+      background-image: url("https://i.ibb.co/mHsWbYW/images.png");
+      background-size: cover;
+      cursor: pointer;
+      transition: transform 0.3s ease;
+      border-radius: 50%;
+    }
+    .copy-icon:hover {
+      transform: scale(1.1);
+    }
+    .typing-dots {
+      display: inline-block;
+      font-size: 24px;
+      letter-spacing: 5px;
+    }
+    .typing-dots span {
+      display: inline-block;
+      animation: jump 1s infinite;
+    }
+    .typing-dots span:nth-child(1) { animation-delay: 0s; }
+    .typing-dots span:nth-child(2) { animation-delay: 0.2s; }
+    .typing-dots span:nth-child(3) { animation-delay: 0.4s; }
+    @keyframes jump {
+      0%, 80%, 100% { transform: translateY(0); }
+      40% { transform: translateY(-8px); }
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <img class="avatar" src="https://i.imgur.com/oUfsj9T.jpeg" alt="Toji Avatar">
+    <h1>TOJI AI</h1>
+    <p>Created by<a href="https://www.facebook.com/61577110900436"> ARI</a></p>
+  </div>
+
+  <div class="container" id="container"></div>
+
+  <div class="input-container">
+    <textarea id="user-input" class="user-input" placeholder="Message Toji..." rows="2"></textarea>
+    <div id="send-icon" class="send-icon">
+      <img src="https://i.ibb.co/Drv7Dhh/17-175309-jpg-free-download-paper-plane-icon-free-paper.jpg" alt="Send">
+    </div>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => hljs.highlightAll());
+
+    const c = document.getElementById('container');
+    const sendIcon = document.getElementById('send-icon');
+    const input = document.getElementById('user-input');
+
+    const initialMessage = document.createElement('div');
+    initialMessage.classList.add('message', 'bot-message');
+    initialMessage.style.textAlign = "center";
+    initialMessage.innerHTML = "How can I help you today?";
+    c.appendChild(initialMessage);
+
+    function sanitizeInput(input) {
+        const div = document.createElement('div');
+        div.innerText = input;
+        return div.innerHTML;
+    }
+
+    async function sendMessage() {
+        const userInput = input.value;
+        if (!userInput.trim() || userInput.length > 10000) return;
+        input.value = '';
+
+        const userMessage = document.createElement('div');
+        userMessage.classList.add('message', 'user-message');
+        userMessage.innerHTML = `<div>${sanitizeInput(userInput).replace(/\n/g, '<br>')}</div>`;
+        c.appendChild(userMessage);
+        c.scrollTop = c.scrollHeight;
+
+        const processingMessage = document.createElement('div');
+        processingMessage.classList.add('message', 'bot-message');
+        processingMessage.innerHTML = `<span class="typing-dots"><span>•</span><span>•</span><span>•</span></span>`;
+        c.appendChild(processingMessage);
+        c.scrollTop = c.scrollHeight;
+
+        try {
+            const response = await getBotResponse(userInput);
+            c.removeChild(processingMessage);
+
+            const botMessage = document.createElement('div');
+            botMessage.classList.add('message', 'bot-message');
+            botMessage.innerHTML = response;
+
+            const copyIcon = document.createElement('div');
+            copyIcon.classList.add('copy-icon');
+            copyIcon.addEventListener('click', () => {
+                navigator.clipboard.writeText(response.replace(/<br>/g, '\n'))
+                    .then(() => alert("Copied to clipboard"))
+                    .catch(err => console.error('Copy error:', err));
+            });
+            botMessage.appendChild(copyIcon);
+            c.appendChild(botMessage);
+            c.scrollTop = c.scrollHeight;
+
+            botMessage.querySelectorAll('pre code').forEach(block => hljs.highlightBlock(block));
+        } catch (error) {
+            console.error('Error:', error.message);
+            processingMessage.innerHTML = `Error: ${error.message}`;
+        }
+    }
+
+    sendIcon.addEventListener('click', sendMessage);
+    input.addEventListener('keypress', event => {
+        if (event.key === 'Enter' && !event.shiftKey) {
+            event.preventDefault();
+            sendMessage();
+        }
+    });
+
+    async function getBotResponse(userInput) {
+        const url = `https://toji-c-ai-api.onrender.com/chat`;
+        const response = await fetch(url, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ message: userInput, character: "Toji", user: "web-user" })
+        });
+
+        if (!response.ok) throw new Error('Network response was not ok');
+
+        const data = await response.json();
+        return data.reply.replace(/\n/g, '<br>');
+    }
+  </script>
+</body>
+</html>
